@@ -14,12 +14,11 @@ const { ccclass, property } = _decorator;
  *
  */
 
-const OUTOFRANGE = 50;
-
 @ccclass('Bullet')
 export class Bullet extends Component {
-    @property
-    public bulletSpeed = 0;
+    private _bulletSpeed = 0;
+
+    private _isEnemyBullet = false;
 
     start () {
         // [3]
@@ -27,13 +26,27 @@ export class Bullet extends Component {
 
     update (deltaTime: number) {
         const pos = this.node.position;
-        const moveLength = pos.z - this.bulletSpeed;
-        this.node.setPosition(pos.x, pos.y, moveLength);
-
-        if(moveLength > OUTOFRANGE){
-            this.node.destroy();
-            console.log('bullet destroy');
+        let moveLength = 0;
+        if (this._isEnemyBullet) {
+            moveLength = pos.z + this._bulletSpeed;
+            this.node.setPosition(pos.x, pos.y, moveLength);
+            if (moveLength > 50) {
+                this.node.destroy();
+                console.log('bullet destroy');
+            }
+        } else {
+            moveLength = pos.z - this._bulletSpeed;
+            this.node.setPosition(pos.x, pos.y, moveLength);
+            if (moveLength < -50) {
+                this.node.destroy();
+                console.log('bullet destroy');
+            }
         }
+    }
+
+    show(speed: number, isEnemyBullet: boolean){
+        this._bulletSpeed = speed;
+        this._isEnemyBullet = isEnemyBullet;
     }
 }
 
