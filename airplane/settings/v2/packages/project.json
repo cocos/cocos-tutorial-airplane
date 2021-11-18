@@ -5,5 +5,32 @@
       "width": 720,
       "height": 1280
     }
+  },
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "SELF_PLAYER"
+      },
+      {
+        "index": 2,
+        "name": "ENEMY_PLAYER"
+      },
+      {
+        "index": 3,
+        "name": "SELF_BULLET"
+      },
+      {
+        "index": 4,
+        "name": "ENEMY_BULET"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 1,
+      "1": 20,
+      "2": 10,
+      "3": 4,
+      "4": 2
+    }
   }
 }
