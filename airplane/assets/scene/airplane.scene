@@ -737,6 +737,7 @@
       "__id__": 24
     },
     "_enabled": true,
+    "__prefab": null,
     "planeSpeed": 5,
     "playerPlane": {
       "__id__": 12
@@ -754,6 +755,7 @@
       "__id__": 32
     },
     "_enabled": true,
+    "__prefab": null,
     "playerPlane": {
       "__id__": 12
     },
@@ -792,6 +794,20 @@
     },
     "createEnemyTime": 1,
     "enemy1Speed": 0.5,
+    "enemy2Speed": 0.7,
+    "bulletPropM": {
+      "__uuid__": "f88d2816-bd0b-42d6-aaa1-45b2395169ce",
+      "__expectedType__": "cc.Prefab"
+    },
+    "bulletPropH": {
+      "__uuid__": "c6ccf2b2-61d9-4166-a528-99e9a6ba035e",
+      "__expectedType__": "cc.Prefab"
+    },
+    "bulletPropS": {
+      "__uuid__": "0fe48e89-2886-4bff-8da1-efa36f997bef",
+      "__expectedType__": "cc.Prefab"
+    },
+    "bulletPropSpeed": 0.3,
     "_id": "a7i3KsvBpFw6k/aa1PX6cF"
   },
   {
