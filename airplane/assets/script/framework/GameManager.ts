@@ -1,8 +1,9 @@
 
-import { _decorator, Component, Node, Prefab, instantiate, math, sp, Vec3, BoxCollider, macro } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, math, Vec3, BoxCollider, macro, Label, Animation } from 'cc';
 import { Bullet } from '../bullet/Bullet';
 import { BulletProp } from '../bullet/BulletProp';
 import { EnemyPlane } from '../plane/EnemyPlane';
+import { SelfPlane } from '../plane/SelfPlane';
 import { Constant } from './Constant';
 const { ccclass, property } = _decorator;
 
@@ -20,8 +21,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
 export class GameManager extends Component {
-    @property(Node)
-    public playerPlane: Node = null;
+    @property(SelfPlane)
+    public playerPlane: SelfPlane = null;
     // bullet
     @property(Prefab)
     public bullet01: Prefab = null;
@@ -62,17 +63,41 @@ export class GameManager extends Component {
     @property
     public bulletPropSpeed = 0.3;
 
+    @property(Node)
+    public gamePage: Node = null;
+    @property(Node)
+    public gameOverPage: Node = null;
+    @property(Label)
+    public gameScore: Label = null;
+    @property(Label)
+    public gameOverScore: Label = null;
+    @property(Animation)
+    public overAnim: Animation = null;
+
+    public isGameStart = false;
+
     private _currShootTime = 0;
     private _isShooting = false;
     private _currCreateEnemyTime = 0;
     private _combinationInterval = Constant.Combination.PLAN1;
     private _bulletType = Constant.BulletPropType.BULLET_M;
+    private _score = 0;
+
 
     start () {
         this._init();
     }
 
     update (deltaTime: number) {
+        if(!this.isGameStart){
+            return;
+        }
+
+        if(this.playerPlane.isDie){
+            this.gameOver();
+            return;
+        }
+
         this._currShootTime += deltaTime;
         if(this._isShooting && this._currShootTime > this.shootTime){
             if (this._bulletType === Constant.BulletPropType.BULLET_H) {
@@ -118,21 +143,60 @@ export class GameManager extends Component {
         }
     }
 
-    public addScore(){
+    public returnMain(){
+        this._currShootTime = 0;
+        this._currCreateEnemyTime = 0;
+        this._combinationInterval = Constant.Combination.PLAN1;
+        this._bulletType = Constant.BulletPropType.BULLET_M;
+        this.playerPlane.node.setPosition(0, 0, 15);
+        this._score = 0;
+    }
 
+    public gameStart(){
+        this.isGameStart = true;
+        this._changePlaneMode();
+        this._score = 0;
+        this.gameScore.string = this._score.toString();
+    }
+
+    public gameReStart(){
+        this.isGameStart = true;
+        this._currShootTime = 0;
+        this._currCreateEnemyTime = 0;
+        this._combinationInterval = Constant.Combination.PLAN1;
+        this._bulletType = Constant.BulletPropType.BULLET_M;
+        this.playerPlane.node.setPosition(0, 0, 15);
+        this._score = 0;
+    }
+
+    public gameOver(){
+        this.isGameStart = false;
+        this.gamePage.active = false;
+        this.gameOverPage.active = true;
+        this.gameOverScore.string = this._score.toString();
+        this.overAnim.play();
+        this._isShooting = false;
+        this.playerPlane.init();
+        this.unschedule(this._modeChanged);
+        this._destroyAll();
+    }
+
+    public addScore(){
+        this._score ++;
+        this.gameScore.string = this._score.toString();
     }
 
     public createPlayerBulletM(){
         const bullet = instantiate(this.bullet01);
         bullet.setParent(this.bulletRoot);
-        const pos = this.playerPlane.position;
+        const pos = this.playerPlane.node.position;
         bullet.setPosition(pos.x, pos.y, pos.z - 7);
         const bulletComp = bullet.getComponent(Bullet);
         bulletComp.show(this.bulletSpeed, false);
     }
 
     public createPlayerBulletH(){
-        const pos = this.playerPlane.position;
+        const pos = this.playerPlane.node.position;
         // left
         const bullet1 = instantiate(this.bullet03);
         bullet1.setParent(this.bulletRoot);
@@ -149,7 +213,7 @@ export class GameManager extends Component {
     }
 
     public createPlayerBulletS(){
-        const pos = this.playerPlane.position;
+        const pos = this.playerPlane.node.position;
         // middle
         const bullet = instantiate(this.bullet05);
         bullet.setParent(this.bulletRoot);
@@ -268,10 +332,7 @@ export class GameManager extends Component {
 
     private _init(){
         this._currShootTime = this.shootTime;
-        this._changePlaneMode();
-
-        //
-        this.createBulletProp();
+        this.playerPlane.init();
     }
 
     private _changePlaneMode(){
@@ -281,6 +342,23 @@ export class GameManager extends Component {
     private _modeChanged(){
         this._combinationInterval ++;
         this.createBulletProp();
+    }
+
+    private _destroyAll(){
+        let children = this.node.children;
+        let length = children.length;
+        let i = 0;
+        for ( i = length - 1; i >= 0 ; i--) {
+            const child = children[i];
+            child.destroy();
+        }
+
+        children = this.bulletRoot.children;
+        length = children.length;
+        for (i = length - 1; i >= 0 ; i--) {
+            const child = children[i];
+            child.destroy();
+        }
     }
 }
 
