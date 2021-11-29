@@ -6,6 +6,7 @@ import { EnemyPlane } from '../plane/EnemyPlane';
 import { SelfPlane } from '../plane/SelfPlane';
 import { AudioManager } from './AudioManager';
 import { Constant } from './Constant';
+import { PoolManager } from './PoolManager';
 const { ccclass, property } = _decorator;
 
 /**
@@ -126,7 +127,7 @@ export class GameManager extends Component {
                 this._currCreateEnemyTime = 0;
             }
         } else if(this._combinationInterval === Constant.Combination.PLAN2){
-            if(this._currCreateEnemyTime > this.createEnemyTime * 0.9){
+            if(this._currCreateEnemyTime > this.createEnemyTime * 3){
                 const randomCombination = math.randomRangeInt(1, 3);
                 if (randomCombination === Constant.Combination.PLAN2) {
                     this.createCombination1();
@@ -137,7 +138,7 @@ export class GameManager extends Component {
                 this._currCreateEnemyTime = 0;
             }
         } else {
-            if(this._currCreateEnemyTime > this.createEnemyTime * 0.8){
+            if(this._currCreateEnemyTime > this.createEnemyTime * 2){
                 const randomCombination = math.randomRangeInt(1, 4);
                 if (randomCombination === Constant.Combination.PLAN2) {
                     this.createCombination1();
@@ -197,8 +198,7 @@ export class GameManager extends Component {
     }
 
     public createPlayerBulletM(){
-        const bullet = instantiate(this.bullet01);
-        bullet.setParent(this.bulletRoot);
+        const bullet = PoolManager.instance().getNode(this.bullet01, this.bulletRoot);
         const pos = this.playerPlane.node.position;
         bullet.setPosition(pos.x, pos.y, pos.z - 7);
         const bulletComp = bullet.getComponent(Bullet);
@@ -208,15 +208,16 @@ export class GameManager extends Component {
     public createPlayerBulletH(){
         const pos = this.playerPlane.node.position;
         // left
-        const bullet1 = instantiate(this.bullet03);
-        bullet1.setParent(this.bulletRoot);
+        // const bullet1 = instantiate(this.bullet03);
+        const bullet1 = PoolManager.instance().getNode(this.bullet03, this.bulletRoot);
+        // bullet1.setParent(this.bulletRoot);
         bullet1.setPosition(pos.x - 2.5, pos.y, pos.z - 7);
         const bulletComp1 = bullet1.getComponent(Bullet);
         bulletComp1.show(this.bulletSpeed, false);
 
         // right
-        const bullet2 = instantiate(this.bullet03);
-        bullet2.setParent(this.bulletRoot);
+        const bullet2 = PoolManager.instance().getNode(this.bullet03, this.bulletRoot);
+        // bullet2.setParent(this.bulletRoot);
         bullet2.setPosition(pos.x + 2.5, pos.y, pos.z - 7);
         const bulletComp2 = bullet2.getComponent(Bullet);
         bulletComp2.show(this.bulletSpeed, false);
@@ -225,30 +226,32 @@ export class GameManager extends Component {
     public createPlayerBulletS(){
         const pos = this.playerPlane.node.position;
         // middle
-        const bullet = instantiate(this.bullet05);
-        bullet.setParent(this.bulletRoot);
+        // const bullet = instantiate(this.bullet05);
+        const bullet = PoolManager.instance().getNode(this.bullet05, this.bulletRoot);
+        // bullet.setParent(this.bulletRoot);
         bullet.setPosition(pos.x, pos.y, pos.z - 7);
         const bulletComp = bullet.getComponent(Bullet);
         bulletComp.show(this.bulletSpeed, false);
 
         // left
-        const bullet1 = instantiate(this.bullet05);
-        bullet1.setParent(this.bulletRoot);
+        const bullet1 = PoolManager.instance().getNode(this.bullet05, this.bulletRoot);
+        // bullet1.setParent(this.bulletRoot);
         bullet1.setPosition(pos.x - 4, pos.y, pos.z - 7);
         const bulletComp1 = bullet1.getComponent(Bullet);
         bulletComp1.show(this.bulletSpeed, false, Constant.Direction.LEFT);
 
         // right
-        const bullet2 = instantiate(this.bullet05);
-        bullet2.setParent(this.bulletRoot);
+        const bullet2 = PoolManager.instance().getNode(this.bullet05, this.bulletRoot);
+        // bullet2.setParent(this.bulletRoot);
         bullet2.setPosition(pos.x + 4, pos.y, pos.z - 7);
         const bulletComp2 = bullet2.getComponent(Bullet);
         bulletComp2.show(this.bulletSpeed, false, Constant.Direction.RIGHT);
     }
 
     public createEnemyBullet(targetPos: Vec3){
-        const bullet = instantiate(this.bullet01);
-        bullet.setParent(this.bulletRoot);
+        // const bullet = instantiate(this.bullet01);
+        const bullet = PoolManager.instance().getNode(this.bullet02, this.bulletRoot);
+        // bullet.setParent(this.bulletRoot);
         bullet.setPosition(targetPos.x, targetPos.y, targetPos.z + 6);
         const bulletComp = bullet.getComponent(Bullet);
         bulletComp.show(1, true);
@@ -270,8 +273,9 @@ export class GameManager extends Component {
             speed = this.enemy2Speed;
         }
 
-        const enemy = instantiate(prefab);
-        enemy.setParent(this.node);
+        // const enemy = instantiate(prefab);
+        const enemy = PoolManager.instance().getNode(prefab, this.node);
+        // enemy.setParent(this.node);
         const enemyComp = enemy.getComponent(EnemyPlane);
         enemyComp.show(this, speed, true);
 
@@ -281,9 +285,10 @@ export class GameManager extends Component {
     public createCombination1(){
         const enemyArray = new Array<Node>(5);
         for (let i = 0; i < enemyArray.length; i++) {
-            enemyArray[i] = instantiate(this.enemy01);
+            // enemyArray[i] = instantiate(this.enemy01);
+            enemyArray[i] = PoolManager.instance().getNode(this.enemy01,this.node );
             const element = enemyArray[i];
-            element.parent = this.node;
+            // element.parent = this.node;
             element.setPosition(-20 + i * 10, 0, -50);
             const enemyComp = element.getComponent(EnemyPlane);
             enemyComp.show(this, this.enemy1Speed, false);
@@ -304,7 +309,8 @@ export class GameManager extends Component {
         ];
 
         for (let i = 0; i < enemyArray.length; i++) {
-            enemyArray[i] = instantiate(this.enemy02);
+            enemyArray[i] = PoolManager.instance().getNode(this.enemy02, this.node);
+            // enemyArray[i] = instantiate(this.enemy02);
             const element = enemyArray[i];
             element.parent = this.node;
             const startIndex = i * 3;
@@ -325,8 +331,9 @@ export class GameManager extends Component {
             prefab = this.bulletPropM;
         }
 
-        const prop = instantiate(prefab);
-        prop.setParent(this.node);
+        // const prop = instantiate(prefab);
+        const prop = PoolManager.instance().getNode(prefab, this.node);
+        // prop.setParent(this.node);
         prop.setPosition(15, 0, -50);
         const propComp = prop.getComponent(BulletProp);
         propComp.show(this, -this.bulletPropSpeed);
@@ -364,14 +371,16 @@ export class GameManager extends Component {
         let i = 0;
         for ( i = length - 1; i >= 0 ; i--) {
             const child = children[i];
-            child.destroy();
+            PoolManager.instance().putNode(child);
+            // child.destroy();
         }
 
         children = this.bulletRoot.children;
         length = children.length;
         for (i = length - 1; i >= 0 ; i--) {
             const child = children[i];
-            child.destroy();
+            PoolManager.instance().putNode(child);
+            // child.destroy();
         }
     }
 }
