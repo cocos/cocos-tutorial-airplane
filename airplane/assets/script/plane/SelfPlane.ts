@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, Collider, ITriggerEvent } from 'cc';
+import { _decorator, Component, Node, Collider, ITriggerEvent, AudioSource } from 'cc';
 import { Constant } from '../framework/Constant';
 const { ccclass, property } = _decorator;
 
@@ -22,6 +22,11 @@ export class SelfPlane extends Component {
     public isDie = false;
 
     private _currLife = 0;
+    private _audioEffect: AudioSource = null;
+
+    start(){
+        this._audioEffect = this.getComponent(AudioSource);
+    }
 
 
     onEnable () {
@@ -49,6 +54,7 @@ export class SelfPlane extends Component {
             this._currLife --;
             if(this._currLife <=0){
                 this.isDie = true;
+                this._audioEffect.play();
                 console.log('self plane is die');
             }
         }
