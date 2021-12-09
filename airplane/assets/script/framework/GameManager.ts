@@ -14,6 +14,7 @@ const { ccclass, property } = _decorator;
  * Name = GameManager
  * DateTime = Mon Nov 15 2021 16:15:32 GMT+0800 (China Standard Time)
  * Author = mywayday
+ * 
  * FileBasename = GameManager.ts
  * FileBasenameNoExtension = GameManager
  * URL = db://assets/script/framework/GameManager.ts
@@ -54,6 +55,8 @@ export class GameManager extends Component {
     public enemy1Speed = 0.5;
     @property
     public enemy2Speed = 0.7;
+    @property(Prefab)
+    public enemyExplode: Prefab = null;
 
     // prop
     @property(Prefab)
@@ -167,17 +170,16 @@ export class GameManager extends Component {
         this._changePlaneMode();
         this._score = 0;
         this.gameScore.string = this._score.toString();
+        this.playerPlane.init();
     }
 
     public gameReStart(){
-        this.isGameStart = true;
+        this.gameStart();
         this._currShootTime = 0;
         this._currCreateEnemyTime = 0;
-        this._changePlaneMode();
         this._combinationInterval = Constant.Combination.PLAN1;
         this._bulletType = Constant.BulletPropType.BULLET_M;
         this.playerPlane.node.setPosition(0, 0, 15);
-        this._score = 0;
     }
 
     public gameOver(){
@@ -187,7 +189,7 @@ export class GameManager extends Component {
         this.gameOverScore.string = this._score.toString();
         this.overAnim.play();
         this._isShooting = false;
-        this.playerPlane.init();
+        // this.playerPlane.init();
         this.unschedule(this._modeChanged);
         this._destroyAll();
     }
@@ -282,6 +284,7 @@ export class GameManager extends Component {
         const randomPos = math.randomRangeInt(-25, 26);
         enemy.setPosition(randomPos, 0, -50);
     }
+
     public createCombination1(){
         const enemyArray = new Array<Node>(5);
         for (let i = 0; i < enemyArray.length; i++) {
@@ -318,6 +321,11 @@ export class GameManager extends Component {
             const enemyComp = element.getComponent(EnemyPlane);
             enemyComp.show(this, this.enemy2Speed, false);
         }
+    }
+
+    public createEnemyEffect(pos: Vec3){
+        const effect = PoolManager.instance().getNode(this.enemyExplode, this.node);
+        effect.setPosition(pos);
     }
 
     public createBulletProp(){

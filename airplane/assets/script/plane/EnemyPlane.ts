@@ -73,6 +73,7 @@ export class EnemyPlane extends Component {
             PoolManager.instance().putNode(this.node);
             // this.node.destroy();
             this._gameManager.addScore();
+            this._gameManager.createEnemyEffect(this.node.position);
         }
     }
 }

@@ -18,6 +18,12 @@ const { ccclass, property } = _decorator;
 
 @ccclass('SelfPlane')
 export class SelfPlane extends Component {
+    @property(Node)
+    public explode: Node = null;
+    @property(Node)
+    public bloodFace: Node = null;
+    @property(Node)
+    public blood: Node = null;
     public lifeValue = 5;
     public isDie = false;
 
@@ -46,15 +52,23 @@ export class SelfPlane extends Component {
     public init(){
         this._currLife = this.lifeValue;
         this.isDie = false;
+        this.explode.active = false;
+        this.bloodFace.setScale(1, 1, 1);
     }
 
     private _onTriggerEnter(event: ITriggerEvent){
         const collisionGroup = event.otherCollider.getGroup();
         if(collisionGroup === Constant.CollisionType.ENEMY_PLANE || collisionGroup === Constant.CollisionType.ENEMY_BULLET){
+            if(this._currLife === this.lifeValue){
+                this.blood.active = true;
+            }
             this._currLife --;
+            this.bloodFace.setScale(this._currLife / this.lifeValue, 1, 1);
             if(this._currLife <=0){
                 this.isDie = true;
                 this._audioEffect.play();
+                this.explode.active = true;
+                this.blood.active = false;
                 console.log('self plane is die');
             }
         }
